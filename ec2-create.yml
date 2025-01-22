@@ -1,0 +1,22 @@
+---
+- hosts: localhost
+  connection: local
+  tasks:
+   - name: create ec2 instance
+     amazon.aws.ec2_instance:
+       name: "{{item.name}}"
+       key_name: "EC2 WindowsVM"
+       vpc_subnet_id: subnet-072a3f98a562cf0f8
+       instance_type: t2.micro
+       security_group: default
+       aws_access_key: "{{ access_key }}" #from_ansible_vault
+       aws_secret_key: "{{ secret_key }}" #from_ansible_vault
+       network_interfaces:
+         - assign_public_ip: true
+       image_id: "{{item.image}}"
+
+     loop:
+       - {image: "ami-0d2614eafc1b0e4d2", name: "by-ansible1"}
+       - {image: "ami-00bb6a80f01f03502", name: "by-ansible2"}
+       - {image: "ami-00bb6a80f01f03502", name: "by-ansible3"}
+
