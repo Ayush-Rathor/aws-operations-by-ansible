@@ -1,0 +1,47 @@
+---
+# tasks file for ec2_instance_creation
+- name: create ec2 instance
+  amazon.aws.ec2_instance:
+    name: "{{item.name}}"
+    key_name: "EC2 WindowsVM"
+    vpc_subnet_id: subnet-072a3f98a562cf0f8
+    instance_type: t2.micro
+    security_group: default
+    network_interfaces:
+      - assign_public_ip: true
+    image_id: "{{item.image}}"
+    user_data: |
+     #!/bin/bash
+     "{{item.data}}"
+    wait: yes
+
+  loop: "{{ instances }}"
+  register: instances
+
+- name: create inventory.ini
+  ansible.builtin.copy:
+    dest: inventory.ini
+    content: "[aws]"
+    force: no
+  ignore_errors: true
+
+- name: add hosts to inventory
+  ansible.builtin.lineinfile:
+    path: inventory.ini
+    regexp: >
+      {%- if item.image_id == 'ami-0d2614eafc1b0e4d2' -%}
+      ^{{ item.public_ip_address }} ansible_user=ec2-user ansible_ssh_common_args='-o StrictHostKeyChecking=no'$
+      {%- elif item.image_id == 'ami-00bb6a80f01f03502' -%}
+      ^{{ item.public_ip_address }} ansible_user=ubuntu ansible_ssh_common_args='-o StrictHostKeyChecking=no'$
+      {%- endif -%}
+    line: >
+      {%- if item.image_id == 'ami-0d2614eafc1b0e4d2' -%}
+      {{ item.public_ip_address }} ansible_user=ec2-user ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+      {%- elif item.image_id == 'ami-00bb6a80f01f03502' -%}
+      {{ item.public_ip_address }} ansible_user=ubuntu ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+      {%- endif -%}
+    create: yes
+    state: present
+
+  loop: "{{ instances.results | map(attribute='instances') | flatten }}"
+

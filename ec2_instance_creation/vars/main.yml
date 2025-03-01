@@ -1,0 +1,13 @@
+---
+# vars file for ec2_instance_creation
+instances:
+  - image: "ami-0d2614eafc1b0e4d2"
+    name: "by-ansible1"
+    data: "sudo yum install python3 -y"
+  - image: "ami-00bb6a80f01f03502"
+    name: "by-ansible2"
+    data: "sudo apt install python3 -y"
+  - image: "ami-00bb6a80f01f03502"
+    name: "by-ansible3"
+    data: "sudo apt install python3 -y"
+

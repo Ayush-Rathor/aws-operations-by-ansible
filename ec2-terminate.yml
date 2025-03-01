@@ -5,11 +5,15 @@
     - name: terminate ec2 instance
       amazon.aws.ec2_instance:
         state: absent
-        instance_ids: "{{item}}"
-        aws_access_key: "{{access_key}}" #from_ansible_vault
-        aws_secret_key: "{{secret_key}}" #from_ansible_vault
-
+        instance_ids: "{{item}}" 
+       
       loop:
-        - "{{ lookup('amazon.aws.aws_ec2', 'name=by-ansible1', aws_access_key=access_key, aws_secret_key=secret_key)}}"
-        - "{{ lookup('amazon.aws.aws_ec2', 'name=by-ansible2', aws_access_key=access_key, aws_secret_key=secret_key)}}"
-        - "{{ lookup('amazon.aws.aws_ec2', 'name=by-ansible3', aws_access_key=access_key, aws_secret_key=secret_key)}}"
+        - "{{ lookup('amazon.aws.aws_ec2', 'name=by-ansible1')}}"
+        - "{{ lookup('amazon.aws.aws_ec2', 'name=by-ansible2')}}"
+        - "{{ lookup('amazon.aws.aws_ec2', 'name=by-ansible3')}}"
+
+    - name: remove inventory.ini
+      ansible.builtin.file:
+        path: inventory.ini
+        state: absent
+      ignore_errors: true
